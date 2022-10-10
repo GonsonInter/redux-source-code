@@ -93,22 +93,21 @@ function assertReducerShape(reducers: ReducersMapObject) {
 }
 
 /**
- * Turns an object whose values are different reducer functions, into a single
- * reducer function. It will call every child reducer, and gather their results
- * into a single state object, whose keys correspond to the keys of the passed
- * reducer functions.
+ * 将值为不同 reducer 函数的对象转换为单个 reducer 函数。
+ * 它将调用所有的 子 reducer，并且把调用结果汇集到一个 单一的 state 对象中，
+ * 这个 state 对象的键就是传入的 reducer 函数名。
  *
- * @template S Combined state object type.
+ * @template S 组合 state 对象的类型。
  *
- * @param reducers An object whose values correspond to different reducer
- *   functions that need to be combined into one. One handy way to obtain it
- *   is to use ES6 `import * as reducers` syntax. The reducers may never
- *   return undefined for any action. Instead, they should return their
- *   initial state if the state passed to them was undefined, and the current
- *   state for any unrecognized action.
+ * @param reducers 一个值对应的 reducer 函数要被合并为一个的对象。
+ *   一个简便方法是使用 ES6  `import * as reducers` 语法来获取。
+ *   reducers 对于任何 action 可能都不会返回 undefined。
+ *   相反的，他们需要返回自己的 初始 state。
+ *   相反，如果传递给它们的 state 是 undefined，它们应该返回初始 state，
+ *   而对于任何无法识别的操作，则返回当前 state。
  *
- * @returns A reducer function that invokes every reducer inside the passed
- *   object, and builds a state object with the same shape.
+ * @returns 一个 reducer 函数，它调用传递对象内的每个 reducer，
+ *   并构建具有相同形状的 state 对象。
  */
 export default function combineReducers<S>(
   reducers: ReducersMapObject<S, any>
@@ -134,19 +133,24 @@ export default function combineReducers(reducers: ReducersMapObject) {
       }
     }
 
+    // 仅保留 reducer 对象中 值为 function 的键值对
     if (typeof reducers[key] === 'function') {
       finalReducers[key] = reducers[key]
     }
   }
   const finalReducerKeys = Object.keys(finalReducers)
 
-  // This is used to make sure we don't warn about the same
-  // keys multiple times.
+  // 这用于确保我们不担心使用到相同的键。
   let unexpectedKeyCache: { [key: string]: true }
   if (process.env.NODE_ENV !== 'production') {
     unexpectedKeyCache = {}
   }
 
+  /**
+   * 校验 reducer 是否都符合规定，见 assertReducerShape 方法
+   * 1. 能不能接受 init 的 action
+   * 2. 能不能处理未知的 action
+   */
   let shapeAssertionError: unknown
   try {
     assertReducerShape(finalReducers)
@@ -158,6 +162,7 @@ export default function combineReducers(reducers: ReducersMapObject) {
     state: StateFromReducersMapObject<typeof reducers> = {},
     action: AnyAction
   ) {
+    // 存在不符合规范的 reducer，直接抛出错误
     if (shapeAssertionError) {
       throw shapeAssertionError
     }
@@ -176,6 +181,11 @@ export default function combineReducers(reducers: ReducersMapObject) {
 
     let hasChanged = false
     const nextState: StateFromReducersMapObject<typeof reducers> = {}
+
+    /**
+     * 遍历所有的 reducer 并分别执行，将计算出的 state 组合起来生成一个大的 state
+     * 因此对于任何 action，redux 都会遍历所有的 reducer
+     */
     for (let i = 0; i < finalReducerKeys.length; i++) {
       const key = finalReducerKeys[i]
       const reducer = finalReducers[key]
@@ -194,6 +204,7 @@ export default function combineReducers(reducers: ReducersMapObject) {
       nextState[key] = nextStateForKey
       hasChanged = hasChanged || nextStateForKey !== previousStateForKey
     }
+    
     hasChanged =
       hasChanged || finalReducerKeys.length !== Object.keys(state).length
     return hasChanged ? nextState : state

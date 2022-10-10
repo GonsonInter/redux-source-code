@@ -10,23 +10,20 @@ import {
 import { Reducer } from './types/reducers'
 
 /**
- * Creates a store enhancer that applies middleware to the dispatch method
- * of the Redux store. This is handy for a variety of tasks, such as expressing
- * asynchronous actions in a concise manner, or logging every action payload.
+ * 创建一个 store enhancer 来将 middleware 应用到 redux store 的 dispatch 方法。
+ * 这对于多种任务来说非常方便，例如，以简洁的方式表达异步操作，或记录每个 action payload。
  *
- * See `redux-thunk` package as an example of the Redux middleware.
+ * 看 `redux-thunk` 包可以作为一个 redux middleware 的例子
+ * 因为 middleware 可能是异步的，所以这应该是组合链中的第一个 store enhancer。
  *
- * Because middleware is potentially asynchronous, this should be the first
- * store enhancer in the composition chain.
+ * 
+ * 注意每个 middleware 都会有 `dispatch` 和 `getState` 函数作为具名参数。
  *
- * Note that each middleware will be given the `dispatch` and `getState` functions
- * as named arguments.
+ * @param middlewares 需要应用的 middleware 链
+ * @returns 一个应用 middleware 的 store enhancer
  *
- * @param middlewares The middleware chain to be applied.
- * @returns A store enhancer applying the middleware.
- *
- * @template Ext Dispatch signature added by a middleware.
- * @template S The type of the state supported by a middleware.
+ * @template Ext middleware 添加的 dispatch 签名
+ * @template S middleware 支持的 state 类型。
  */
 export default function applyMiddleware(): StoreEnhancer
 export default function applyMiddleware<Ext1, S>(
@@ -78,6 +75,11 @@ export default function applyMiddleware(
         dispatch: (action, ...args) => dispatch(action, ...args)
       }
       const chain = middlewares.map(middleware => middleware(middlewareAPI))
+      /**
+       * chain的结构： Array< (next: Dispatch<AnyAction>) => (action: AnyAction) => any >
+       * compose 的作用：compose(A, B, C, arg) === A(B(C(arg))) 最后一个参数是 store.dispatch，
+       *    使得 middleware 依次执行，最后执行 store.dispatch。  柯里化，串联
+       */
       dispatch = compose<typeof dispatch>(...chain)(store.dispatch)
 
       return {

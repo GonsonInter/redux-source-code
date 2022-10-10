@@ -6,6 +6,12 @@ import {
 } from './types/actions'
 import { kindOf } from './utils/kindOf'
 
+/**
+ * 给单个 action 绑定 dispatch 函数
+ * @param actionCreator 一个 action creator 函数
+ * @param dispatch store.dispatch 方法
+ * @returns 返回一个函数，这个函数直接调用就相当于 dispatch 一个对应的 action
+ */
 function bindActionCreator<A extends AnyAction = AnyAction>(
   actionCreator: ActionCreator<A>,
   dispatch: Dispatch
@@ -16,25 +22,21 @@ function bindActionCreator<A extends AnyAction = AnyAction>(
 }
 
 /**
- * Turns an object whose values are action creators, into an object with the
- * same keys, but with every function wrapped into a `dispatch` call so they
- * may be invoked directly. This is just a convenience method, as you can call
- * `store.dispatch(MyActionCreators.doSomething())` yourself just fine.
+ * 把一个值都是 action creator 的对象转化成另一个有着相同键的对象，
+ * 但是每个函数都封装了一个 `dispatch` 调用进去，所以都能被直接调用。
+ * 这是个简便方法，你可以自己调用 `store.dispatch(MyActionCreators.doSomething())`
+ * 
+ * 为了方便，你也能传一个 action creator 进去作为第一个参数，
+ * 返回值得到了一个 封装了 dispatch 的函数
  *
- * For convenience, you can also pass an action creator as the first argument,
- * and get a dispatch wrapped function in return.
+ * @param actionCreators 一个值都是 action creator 函数的对象。
+ * 一个简单的获得方法就是使用 ES6 语法 `import * as`，
+ * 你也可以传单个函数。
  *
- * @param actionCreators An object whose values are action
- * creator functions. One handy way to obtain it is to use ES6 `import * as`
- * syntax. You may also pass a single function.
+ * @param dispatch Redux store 中可用的 `dispatch` 函数。
  *
- * @param dispatch The `dispatch` function available on your Redux
- * store.
- *
- * @returns The object mimicking the original object, but with
- * every action creator wrapped into the `dispatch` call. If you passed a
- * function as `actionCreators`, the return value will also be a single
- * function.
+ * @returns 模仿原始对象的对象，但是每个 action creator 都封装进了 `dispatch` 调用。
+ * 如果你传入一个函数比如 `actionCreators` ，返回值仍然是单个函数。
  */
 export default function bindActionCreators<A, C extends ActionCreator<A>>(
   actionCreator: C,

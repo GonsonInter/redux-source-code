@@ -1,14 +1,13 @@
 type Func<T extends any[], R> = (...a: T) => R
 
 /**
- * Composes single-argument functions from right to left. The rightmost
- * function can take multiple arguments as it provides the signature for the
- * resulting composite function.
+ * 从右到左组成单参数函数。
+ * 最右边的函数可以接受多个参数，因为它为生成的复合函数提供签名。
  *
- * @param funcs The functions to compose.
- * @returns A function obtained by composing the argument functions from right
- *   to left. For example, `compose(f, g, h)` is identical to doing
- *   `(...args) => f(g(h(...args)))`.
+ * @param funcs 要组合的函数
+ * @returns 一个从右到左组合参数函数的函数。
+ * 比如， `compose(f, g, h)` 等同于
+ *   `(...args) => f(g(h(...args)))`。
  */
 export default function compose(): <R>(a: R) => R
 
@@ -45,7 +44,7 @@ export default function compose<R>(...funcs: Function[]): (...args: any[]) => R
 
 export default function compose(...funcs: Function[]) {
   if (funcs.length === 0) {
-    // infer the argument type so it is usable in inference down the line
+    // 推断参数类型，使其在推断中可用
     return <T>(arg: T) => arg
   }
 
