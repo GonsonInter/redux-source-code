@@ -16,7 +16,6 @@ import { Reducer } from './types/reducers'
  * 看 `redux-thunk` 包可以作为一个 redux middleware 的例子
  * 因为 middleware 可能是异步的，所以这应该是组合链中的第一个 store enhancer。
  *
- * 
  * 注意每个 middleware 都会有 `dispatch` 和 `getState` 函数作为具名参数。
  *
  * @param middlewares 需要应用的 middleware 链
@@ -79,6 +78,8 @@ export default function applyMiddleware(
        * chain的结构： Array< (next: Dispatch<AnyAction>) => (action: AnyAction) => any >
        * compose 的作用：compose(A, B, C, arg) === A(B(C(arg))) 最后一个参数是 store.dispatch，
        *    使得 middleware 依次执行，最后执行 store.dispatch。  柯里化，串联
+       * compose 传入的函数列表后，新生成的 dispatch 调用的时候相当于依次调用这些 middleware 后
+       *    最后调用原生的 store.dispatch
        */
       dispatch = compose<typeof dispatch>(...chain)(store.dispatch)
 

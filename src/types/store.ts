@@ -124,9 +124,8 @@ export type Observer<T> = {
 }
 
 /**
- * A store is an object that holds the application's state tree.
- * There should only be a single store in a Redux app, as the composition
- * happens on the reducer level.
+ * store 是一个维护 app 状态树的对象
+ * 一个 redux app 只能有一个 store，拆分和组合只能发生在 reducer 层面中
  *
  * @template S The type of state held by this store.
  * @template A the type of actions which may be dispatched by this store.
@@ -140,19 +139,15 @@ export interface Store<
   Ext = {}
 > {
   /**
-   * Dispatches an action. It is the only way to trigger a state change.
-   *
-   * The `reducer` function, used to create the store, will be called with the
-   * current state tree and the given `action`. Its return value will be
-   * considered the **next** state of the tree, and the change listeners will
-   * be notified.
-   *
-   * The base implementation only supports plain object actions. If you want
-   * to dispatch a Promise, an Observable, a thunk, or something else, you
-   * need to wrap your store creating function into the corresponding
-   * middleware. For example, see the documentation for the `redux-thunk`
-   * package. Even the middleware will eventually dispatch plain object
-   * actions using this method.
+   * dispatch action。触发 state 更新的唯一方法
+   * 
+   * 创建 store 的时候要传入一个 reducer 函数，调 diapatch 函数的时候就会调那个 reducer 方法，
+   * 并传入对应的 action
+   * dispatch 方法会产生一个新的 state tree，且所有的监听者都会被通知
+   * 
+   * 基础实现仅支持普通js对象的 action，如果想要 dispatch promise、observable、thunk
+   * 或其他什么东西要使用 middleware。举例，可以去看 redux-thunk 包的文档。
+   * 但是使用 middleware 之后最终也会使用这个方法 dispatch 一个普通js对象 action
    *
    * @param action A plain object representing “what changed”. It is a good
    *   idea to keep actions serializable so you can record and replay user
@@ -168,17 +163,16 @@ export interface Store<
   dispatch: Dispatch<A>
 
   /**
-   * Reads the state tree managed by the store.
+   * 获取 store 维护的 state
    *
    * @returns The current state tree of your application.
    */
   getState(): S
 
   /**
-   * Adds a change listener. It will be called any time an action is
-   * dispatched, and some part of the state tree may potentially have changed.
-   * You may then call `getState()` to read the current state tree inside the
-   * callback.
+   * 添加一个变化监听者。
+   * 任意 action 被 dispatch 的时候都会被调用，state 树的某个部分可能会被更新了。
+   * 可以在传入的回调函数中调用 getState 来获取最新的 state 树。
    *
    * You may call `dispatch()` from a change listener, with the following
    * caveats:
@@ -201,22 +195,22 @@ export interface Store<
   subscribe(listener: () => void): Unsubscribe
 
   /**
-   * Replaces the reducer currently used by the store to calculate the state.
+   * 替换当前 store 用来计算最新 state 的 reducer 函数
+   * 
+   * app 如果实现了 code splitting，那可能要动态加载 reducer。
+   * 如果对 redux 要实现热重载，也可能要用到这个方法
    *
-   * You might need this if your app implements code splitting and you want to
-   * load some of the reducers dynamically. You might also need this if you
-   * implement a hot reloading mechanism for Redux.
-   *
-   * @param nextReducer The reducer for the store to use instead.
+   * @param nextReducer 返回新替换了 reducer 的 store
    */
   replaceReducer<NewState, NewActions extends Action>(
     nextReducer: Reducer<NewState, NewActions>
   ): Store<ExtendState<NewState, StateExt>, NewActions, StateExt, Ext> & Ext
 
   /**
-   * Interoperability point for observable/reactive libraries.
-   * @returns {observable} A minimal observable of state changes.
-   * For more information, see the observable proposal:
+   * 观察者/响应式库的互操作点。
+   * 
+   * @returns {observable} 变化的最小 observable.
+   * 详情可以查看 observable 提案:
    * https://github.com/tc39/proposal-observable
    */
   [Symbol.observable](): Observable<S>
@@ -246,9 +240,8 @@ export interface StoreCreator {
 }
 
 /**
- * A store enhancer is a higher-order function that composes a store creator
- * to return a new, enhanced store creator. This is similar to middleware in
- * that it allows you to alter the store interface in a composable way.
+ * store enhancer 是一个高阶函数，将一个 store creator 组装成一个新的，增强过的
+ * store creator。和 middleware 相似，以组合式方式更改 store。
  *
  * Store enhancers are much the same concept as higher-order components in
  * React, which are also occasionally called “component enhancers”.
@@ -269,6 +262,8 @@ export interface StoreCreator {
 export type StoreEnhancer<Ext = {}, StateExt = never> = (
   next: StoreEnhancerStoreCreator<Ext, StateExt>
 ) => StoreEnhancerStoreCreator<Ext, StateExt>
+
+/** 增强过的 storeCreator 类型 */
 export type StoreEnhancerStoreCreator<Ext = {}, StateExt = never> = <
   S = any,
   A extends Action = AnyAction

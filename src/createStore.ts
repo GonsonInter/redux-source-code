@@ -113,7 +113,6 @@ export default function createStore<
   let isDispatching = false
 
   /**
-   * 
    * 对 currentListeners 做一次浅拷贝，
    * 使得我们在 dispatch 过程中可以使用 nextListeners 作为临时的 list
    * 
@@ -182,6 +181,11 @@ export default function createStore<
 
     let isSubscribed = true
 
+    /**
+     * 对于 nextListeners 也用的是不可变更新方式，
+     * 以免在正在 dispatch 的时候添加或者移出 listener 发生错误
+     * 也就是说，只有在对应 action 被 dispatch 之前添加或者移除 listener 才有效
+     */
     ensureCanMutateNextListeners()
     nextListeners.push(listener)
 
@@ -235,6 +239,7 @@ export default function createStore<
       )
     }
 
+    // action 必须拥有 type 字段
     if (typeof action.type === 'undefined') {
       throw new Error(
         'Actions may not have an undefined "type" property. You may have misspelled an action type string constant.'
@@ -252,6 +257,7 @@ export default function createStore<
       isDispatching = false
     }
 
+    // 依次通知 listener
     const listeners = (currentListeners = nextListeners)
     for (let i = 0; i < listeners.length; i++) {
       const listener = listeners[i]

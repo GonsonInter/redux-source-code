@@ -264,3 +264,42 @@ Meet some of the outstanding companies that made it possible:
 ## License
 
 [MIT](LICENSE.md)
+
+```
+redux                                                              //
+├─ .babelrc.js                                                     //
+├─ .editorconfig                                                   //
+├─ .gitignore                                                      //
+├─ .prettierrc.json                                                //
+├─ CHANGELOG.md                                                    //
+├─ CNAME                                                           //
+├─ CODE_OF_CONDUCT.md                                              //
+├─ CONTRIBUTING.md                                                 //
+├─ LICENSE-logo.md                                                 //
+├─ LICENSE.md                                                      //
+├─ PATRONS.md                                                      //
+├─ README.md                                                       //
+├─ docs                                                            //
+├─ errors.json                                                     //
+├─ logo                                                            //
+├─ netlify.toml                                                    //
+├─ package-lock.json                                               //
+├─ package.json                                                    //
+├─ rollup.config.js                                                //
+├─ scripts                                                         //
+├─ src                                                             //
+│  ├─ applyMiddleware.ts                                           //
+│  ├─ bindActionCreators.ts                                        //
+│  ├─ combineReducers.ts                                           //
+│  ├─ compose.ts                                                   //
+│  ├─ createStore.ts                                               //
+│  ├─ index.ts                                                     //
+│  └─ utils                                                        //
+│     ├─ isPlainObject.ts                                          //
+│     ├─ kindOf.ts                                                 //
+│     ├─ symbol-observable.ts                                      //
+│     └─ warning.ts                                                //
+├─ tsconfig.json                                                   //
+└─ website                                                         //
+
+```
