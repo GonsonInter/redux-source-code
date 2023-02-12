@@ -93,7 +93,7 @@ function assertReducerShape(reducers: ReducersMapObject) {
 }
 
 /**
- * 将值为不同 reducer 函数的对象转换为单个 reducer 函数。
+ * 将多个 Reducer 函数整合为一个 Reducer，以便在 Redux 中管理多个不同的数据状态
  * 它将调用所有的 子 reducer，并且把调用结果汇集到一个 单一的 state 对象中，
  * 这个 state 对象的键就是传入的 reducer 函数名。
  *
@@ -122,7 +122,9 @@ export default function combineReducers<M extends ReducersMapObject>(
   ActionFromReducersMapObject<M>
 >
 export default function combineReducers(reducers: ReducersMapObject) {
+  // 所有 reducer 的 key
   const reducerKeys = Object.keys(reducers)
+  // 最终生成的 reducer 对象
   const finalReducers: ReducersMapObject = {}
   for (let i = 0; i < reducerKeys.length; i++) {
     const key = reducerKeys[i]
@@ -147,7 +149,7 @@ export default function combineReducers(reducers: ReducersMapObject) {
   }
 
   /**
-   * 校验 reducer 是否都符合规定，见 assertReducerShape 方法
+   * 校验 reducer 是否都符合规定，见 assertReducerShape 方法（后面介绍）
    * 1. 能不能接受 init 的 action
    * 2. 能不能处理未知的 action
    */
